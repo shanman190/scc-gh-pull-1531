@@ -1,0 +1,31 @@
+contracts {
+    sourceSet = "contractTest"
+    contractsDslDir = file("src/test/resources/contracts")
+
+    baseClassForTests = 'com.example.contract.HelloBase'
+}
+
+sourceSets {
+    contractTest {
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+configurations {
+    contractTestCompileOnly.extendsFrom(testCompileOnly)
+    contractTestImplementation.extendsFrom(testImplementation)
+    contractTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+}
+
+def contractTest = tasks.register("contractTest", Test) {
+    description = "Runs the contract tests"
+    group = "Verification"
+
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+
+    mustRunAfter tasks.test
+}
+
+tasks.check.dependsOn(contractTest)
